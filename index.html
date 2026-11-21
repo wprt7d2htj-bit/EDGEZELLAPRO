@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdgeZella PRO — Journal • Playbook • Radar • Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #050912;
+      --card: #0c1322;
+      --card-2: #121b30;
+      --card-3: #17223c;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #22314f;
+      --primary: #6366f1;
+      --primary-2: #8b5cf6;
+      --accent: #06b6d4;
+      --demo-bg: #062b24;
+      --demo-border: #0d9488;
+      --demo-text: #5eead4;
+      --input-bg: #0b1220;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    body.light {
+      --bg: #eef2f6;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --card-3: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --primary: #4f46e5;
+      --primary-2: #7c3aed;
+      --accent: #0284c7;
+      --demo-bg: #ecfdf5;
+      --demo-border: #34d399;
+      --demo-text: #047857;
+      --input-bg: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 14px;
+    }
+
+    .centered-wrap {
+      min-height: calc(100vh - 28px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-box {
+      width: 100%;
+      max-width: 450px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.48);
+    }
+
+    .top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+      color: #fff;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+    }
+
+    .title-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .pro-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.22);
+      color: #a5b4fc;
+      font-weight: 700;
+    }
+
+    body.light .pro-badge {
+      color: #3730a3;
+      background: rgba(79, 70, 229, 0.14);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .theme-btn, .icon-btn, .secondary-btn {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .theme-btn:hover, .icon-btn:hover, .secondary-btn:hover {
+      background: var(--card-3);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: var(--card-2);
+      padding: 5px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14.5px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .primary-btn {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary-btn:hover {
+      filter: brightness(1.07);
+    }
+
+    .divider {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 13px 0;
+    }
+
+    .demo-btn {
+      width: 100%;
+      padding: 12.5px;
+      border-radius: 12px;
+      background: var(--demo-bg);
+      border: 1px solid var(--demo-border);
+      color: var(--demo-text);
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .status-msg {
+      margin-top: 10px;
+      font-size: 13px;
+      min-height: 18px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Full App Shell */
+    .app-shell {
+      display: none;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .mobile-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .sidebar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: sticky;
+      top: 14px;
+    }
+
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.75);
+      z-index: 40;
+    }
+
+    .drawer-backdrop.open {
+      display: block;
+    }
+
+    @media (max-width: 920px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -310px;
+        bottom: 0;
+        width: 285px;
+        max-width: 86vw;
+        border-radius: 0 20px 20px 0;
+        z-index: 50;
+        overflow-y: auto;
+        transition: left 0.22s ease;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+    }
+
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: var(--card-2);
+    }
+
+    .nav-item.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.45);
+      color: #c7d2fe;
+    }
+
+    body.light .nav-item.active {
+      color: #3730a3;
+    }
+
+    .nav-emoji {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-top: 6px;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .main-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .pos { color: var(--success); }
+    .neg { color: var(--danger); }
+    .warn { color: var(--warning); }
+
+    .equity-svg-wrap {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .cal-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+    }
+
+    .cal-dow {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    .cal-day {
+      min-height: 70px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 7px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .cal-day:hover {
+      background: var(--card-3);
+    }
+
+    .cal-day.win {
+      border-color: rgba(34, 197, 94, 0.55);
+      background: rgba(34, 197, 94, 0.12);
+    }
+
+    .cal-day.loss {
+      border-color: rgba(239, 68, 68, 0.55);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .cal-day.empty {
+      background: transparent;
+      border-style: dashed;
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .trade-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .danger-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.14);
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    body.light .danger-btn {
+      color: #b91c1c;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      z-index: 60;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid-2, .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      margin-top: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .checklist-item input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+
+
+    .ui-icon {
+      width: 17px;
+      height: 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--text);
+      opacity: 0.9;
+    }
+    .theme-btn .ui-icon,
+    .icon-btn .ui-icon,
+    .secondary-btn .ui-icon {
+      color: var(--text);
+      opacity: 1;
+    }
+    .primary-btn .ui-icon,
+    .demo-btn .ui-icon,
+    .nav-item.active .ui-icon {
+      color: currentColor;
+      opacity: 1;
+    }
+
+    .ui-icon {
+      width: 17px;
+      height: 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--muted);
+    }
+    .nav-item.active .ui-icon,
+    .primary-btn .ui-icon,
+    .demo-btn .ui-icon {
+      color: currentColor;
+    }
+    #authCard button, #authCard .tab-btn, #authCard .primary-btn, #authCard .demo-btn {
+      position: relative;
+      z-index: 2;
+      pointer-events: auto;
+    }
+    .ui-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .icon-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      vertical-align: middle;
+    }
+
+    pre.sql-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12px;
+      overflow-x: auto;
+      color: var(--text);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <!-- AUTH SCREEN -->
+  <div id="authWrap" class="centered-wrap">
+    <div id="authCard" class="auth-box">
+      <div class="top-row">
+        <div class="brand">
+          <div class="logo">EZ</div>
+          <div>
+            <div class="title-line">
+              <span>EdgeZella</span>
+              <span class="pro-badge">PRO</span>
+            </div>
+            <div class="subtitle">Trading Journal • Playbook • Session Radar • Analytics</div>
+          </div>
+        </div>
+        <button id="authThemeBtn" type="button" class="theme-btn"><span class="icon-inline"><span class="ui-icon" data-ico="sun"></span><span>Light</span></span></button>
+      </div>
+
+      <div class="tabs">
+        <button id="tabSignIn" type="button" class="tab-btn active"><span class="icon-inline"><span class="ui-icon" data-ico="lock"></span><span>Sign In</span></span></button>
+        <button id="tabCreateAccount" type="button" class="tab-btn"><span class="icon-inline"><span class="ui-icon" data-ico="rocket"></span><span>Create Account</span></span></button>
+      </div>
+
+      <form id="authForm">
+        <div id="nameField" class="field" style="display:none;">
+          <label for="nameInput"><span class="icon-inline"><span class="ui-icon" data-ico="user"></span><span>Trader Name</span></span></label>
+          <input id="nameInput" type="text" placeholder="e.g. Trader" value="Trader" />
+        </div>
+
+        <div class="field">
+          <label for="emailInput"><span class="icon-inline"><span class="ui-icon" data-ico="mail"></span><span>Email Address</span></span></label>
+          <input id="emailInput" type="email" value="trader@edgezella.io" required />
+        </div>
+
+        <div class="field">
+          <label for="passwordInput"><span class="icon-inline"><span class="ui-icon" data-ico="key"></span><span>Password</span></span></label>
+          <input id="passwordInput" type="password" value="12345678" required />
+        </div>
+
+        <button id="submitAuthBtn" type="submit" class="primary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="lock"></span><span>Sign In to Journal</span></span></button>
+      </form>
+
+      <div class="divider">— or launch immediately —</div>
+
+      <button id="demoBtn" type="button" class="demo-btn"><span class="icon-inline"><span class="ui-icon" data-ico="zap"></span><span>Enter Instant Demo Account</span></span></button>
+
+      <div id="statusMsg" class="status-msg"></div>
+
+      <div class="footer-note">
+        Supabase Ready • Adaptive Light &amp; Dark Mode • Mobile &amp; Desktop Ready
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div id="appShell" class="app-shell">
+    <div class="mobile-topbar">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button id="menuToggleBtn" type="button" class="icon-btn">☰ Menu</button>
+        <div>
+          <div class="title-line" style="font-size:17px;">
+            <span>EdgeZella</span>
+            <span class="pro-badge">PRO</span>
+          </div>
+          <div id="headerUserSubtitle" class="subtitle">👤 Trader</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+        <button id="topThemeBtn" type="button" class="icon-btn"><span class="icon-inline"><span class="ui-icon" data-ico="sun"></span><span>Light</span></span></button>
+        <button id="quickAddBtn" type="button" class="primary-btn" style="width:auto; padding:9px 13px; font-size:13px;"><span class="icon-inline"><span class="ui-icon" data-ico="plus"></span><span>Add Trade</span></span></button>
+      </div>
+    </div>
+
+    <div id="drawerBackdrop" class="drawer-backdrop"></div>
+
+    <div class="app-layout">
+      <!-- SIDEBAR / DRAWER -->
+      <aside id="sidebarMenu" class="sidebar">
+        <div class="top-row" style="margin-bottom:4px;">
+          <div class="brand">
+            <div class="logo" style="width:38px; height:38px; font-size:14px;">EZ</div>
+            <div>
+              <div style="font-weight:800; font-size:15px;">EdgeZella <span class="pro-badge">PRO</span></div>
+              <div class="subtitle" style="color:#f59e0b;"><span class="icon-inline"><span class="ui-icon" data-ico="zap"></span><span>Trading Command Center</span></span></div>
+            </div>
+          </div>
+          <button id="closeDrawerBtn" type="button" class="icon-btn" style="padding:5px 9px;">✕</button>
+        </div>
+
+        <button id="sidebarAddTradeBtn" type="button" class="primary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="plus"></span><span>Add Trade</span></span></button>
+
+        <div class="nav-item" style="background:var(--card-2); border-color:var(--border); justify-content:space-between; cursor:default;">
+          <span class="icon-inline"><span class="ui-icon" data-ico="palette"></span><span>Appearance</span></span>
+          <button id="sidebarThemeBtn" type="button" class="secondary-btn" style="padding:5px 10px;"><span class="icon-inline"><span class="ui-icon" data-ico="sun"></span><span>Light</span></span></button>
+        </div>
+
+        <button class="nav-item active" data-view="dashboard">
+          <span class="ui-icon" data-ico="dashboard"></span>
+          <span>Dashboard</span>
+        </button>
+
+        <button class="nav-item" data-view="calendar">
+          <span class="ui-icon" data-ico="calendar"></span>
+          <span>P&amp;L Calendar</span>
+        </button>
+
+        <button class="nav-item" data-view="trades">
+          <span class="ui-icon" data-ico="list"></span>
+          <span>Trades Log</span>
+        </button>
+
+        <button class="nav-item" data-view="playbook">
+          <span class="ui-icon" data-ico="target"></span>
+          <span>Playbook &amp; Setups</span>
+        </button>
+
+        <button class="nav-item" data-view="radar">
+          <span class="ui-icon" data-ico="radar"></span>
+          <span>Session Radar</span>
+        </button>
+
+        <button class="nav-item" data-view="journal">
+          <span class="ui-icon" data-ico="book"></span>
+          <span>Daily Journal</span>
+        </button>
+
+        <button class="nav-item" data-view="analytics">
+          <span class="ui-icon" data-ico="chart"></span>
+          <span>Reports &amp; Analytics</span>
+        </button>
+
+        <div class="section-label"><span class="icon-inline"><span class="ui-icon" data-ico="save"></span><span>Backup &amp; Data</span></span></div>
+        <div class="btn-row">
+          <button id="exportJsonBtn" type="button" class="secondary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="download"></span><span>JSON</span></span></button>
+          <button id="exportCsvBtn" type="button" class="secondary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="download"></span><span>CSV</span></span></button>
+        </div>
+        <button id="resetSampleBtn" type="button" class="danger-btn"><span class="icon-inline"><span class="ui-icon" data-ico="refresh"></span><span>Reset / Load Sample Trades</span></span></button>
+
+        <div class="stat-card" style="margin-top:4px;">
+          <div style="font-weight:700; font-size:13px; margin-bottom:4px;"><span class="icon-inline"><span class="ui-icon" data-ico="cloud"></span><span>Cloud &amp; SQL Status</span></span></div>
+          <div id="cloudStatusText" class="subtitle" style="margin-bottom:8px;">Local Storage Active • SQL Ready</div>
+          <button id="openSqlModalBtn" type="button" class="secondary-btn" style="width:100%;"><span class="icon-inline"><span class="ui-icon" data-ico="database"></span><span>View Supabase SQL Setup</span></span></button>
+        </div>
+
+        <div class="stat-card" style="margin-top:2px;">
+          <div id="sidebarAccountName" style="font-weight:800; font-size:13px;">👤 TRADER</div>
+          <div id="sidebarAccountEmail" class="subtitle" style="margin-bottom:8px;">📧 trader@edgezella.io</div>
+          <button id="signOutBtn" type="button" class="secondary-btn" style="width:100%;"><span class="icon-inline"><span class="ui-icon" data-ico="logout"></span><span>Sign Out</span></span></button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT VIEWS -->
+      <main class="main-panel">
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="view-section active">
+          <div class="top-row">
+            <div>
+              <h2 style="margin:0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="dashboard"></span><span>Performance Dashboard</span></span></h2>
+              <div class="subtitle">Live P&amp;L, win rate, profit factor, expectancy, streak &amp; equity</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button id="editBaseEquityBtn" type="button" class="secondary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="wallet"></span><span>Base Equity</span></span></button>
+              <span id="dashTradeCountBadge" class="badge-pill">📈 0 Trades</span>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="dollar"></span><span>Net P&amp;L</span></div>
+              <div id="statNetPnl" class="stat-val pos">+$0.00</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="target"></span><span>Win Rate</span></div>
+              <div id="statWinRate" class="stat-val">🎯 0.0%</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="scale"></span><span>Profit Factor</span></div>
+              <div id="statProfitFactor" class="stat-val">⚖️ 0.00</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="ruler"></span><span>Avg R-Multiple</span></div>
+              <div id="statAvgR" class="stat-val">📐 +0.00R</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="flame"></span><span>Current Streak</span></div>
+              <div id="statStreak" class="stat-val">🔥 0 Days</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title"><span class="ui-icon" data-ico="wallet"></span><span>Account Equity</span></div>
+              <div id="statEquity" class="stat-val">$10,000.00</div>
+            </div>
+          </div>
+
+          <div class="equity-svg-wrap">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong class="icon-inline"><span class="ui-icon" data-ico="chart"></span><span>Equity Curve Progression</span></strong>
+              <span id="equityReturnBadge" class="subtitle">📊 +0.00% return</span>
+            </div>
+            <svg id="equitySvg" viewBox="0 0 600 150" width="100%" height="150" style="display:block;">
+              <line x1="20" y1="130" x2="580" y2="130" stroke="#334155" stroke-width="1" />
+              <polyline id="equityPolyline" fill="none" stroke="#22c55e" stroke-width="3" points="20,75 580,75" />
+            </svg>
+          </div>
+
+          <div class="stat-card" style="margin-bottom:14px;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+              <strong class="icon-inline"><span class="ui-icon" data-ico="calendar"></span><span>Weekly P&amp;L Strip (Mon–Sun)</span></strong>
+              <span class="subtitle">Tap any day to log a trade</span>
+            </div>
+            <div id="weeklyStrip" class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(98px, 1fr)); margin-bottom:0;"></div>
+          </div>
+
+          <div class="stat-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <strong class="icon-inline"><span class="ui-icon" data-ico="clock"></span><span>Recent Executions</span></strong>
+              <button type="button" class="secondary-btn" onclick="switchView('trades')"><span class="icon-inline"><span class="ui-icon" data-ico="list"></span><span>View All</span></span></button>
+            </div>
+            <div id="recentTradesContainer"></div>
+          </div>
+        </section>
+
+        <!-- P&L CALENDAR -->
+        <section id="view-calendar" class="view-section">
+          <div class="cal-header">
+            <div>
+              <h2 style="margin:0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="calendar"></span><span>P&amp;L Calendar</span></span></h2>
+              <div class="subtitle">Profit Day • Loss Day • Flat Day (Tap any date to add trade)</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button id="prevMonthBtn" type="button" class="icon-btn"><span class="ui-icon" data-ico="chevLeft"></span></button>
+              <strong id="calMonthLabel">📅 November 2026</strong>
+              <button id="nextMonthBtn" type="button" class="icon-btn"><span class="ui-icon" data-ico="chevRight"></span></button>
+            </div>
+          </div>
+          <div id="calendarGrid" class="cal-grid"></div>
+        </section>
+
+        <!-- TRADES LOG -->
+        <section id="view-trades" class="view-section">
+          <div class="top-row">
+            <div>
+              <h2 style="margin:0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="list"></span><span>Trades Log</span></span></h2>
+              <div class="subtitle">Search, filter, inspect &amp; manage all executions</div>
+            </div>
+            <button type="button" class="primary-btn" style="width:auto; padding:10px 14px;" onclick="openTradeModal()"><span class="icon-inline"><span class="ui-icon" data-ico="plus"></span><span>New Trade</span></span></button>
+          </div>
+
+          <div class="filter-bar">
+            <input id="searchPairInput" type="text" placeholder="🔍 Filter by pair (e.g. XAU/USD, NQ)..." style="max-width:260px;" />
+            <select id="filterSideSelect" style="max-width:170px;">
+              <option value="ALL">🧭 All Directions</option>
+              <option value="Long">🟢 Long Only</option>
+              <option value="Short">🔴 Short Only</option>
+            </select>
+            <select id="filterOutcomeSelect" style="max-width:170px;">
+              <option value="ALL">📊 All Outcomes</option>
+              <option value="WIN">🟢 Winners Only</option>
+              <option value="LOSS">🔴 Losers Only</option>
+            </select>
+          </div>
+
+          <div id="fullTradesList"></div>
+        </section>
+
+        <!-- PLAYBOOK -->
+        <section id="view-playbook" class="view-section">
+          <div class="top-row">
+            <div>
+              <h2 style="margin:0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="target"></span><span>Playbook &amp; Setups</span></span></h2>
+              <div class="subtitle">High-probability edge models &amp; interactive execution checklist</div>
+            </div>
+            <button id="addPlaybookBtn" type="button" class="secondary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="plus"></span><span>Add Custom Setup</span></span></button>
+          </div>
+          <div id="playbookGrid" class="stats-grid"></div>
+        </section>
+
+        <!-- SESSION RADAR -->
+        <section id="view-radar" class="view-section">
+          <h2 style="margin:0 0 6px 0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="radar"></span><span>Session Radar</span></span></h2>
+          <div class="subtitle" style="margin-bottom:14px;">Global market sessions, PKT windows &amp; primary focus instruments</div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div style="font-weight:800; font-size:15px; margin-bottom:4px;"><span class="icon-inline"><span class="ui-icon" data-ico="globe"></span><span>Asian Session</span></span></div>
+              <div class="subtitle" style="margin-bottom:6px;">🕒 ~04:00 AM – 01:00 PM PKT</div>
+              <div class="subtitle">📍 Range &amp; liquidity buildup • 🪙 BTC/USDT • 🥇 XAU/USD</div>
+            </div>
+            <div class="stat-card">
+              <div style="font-weight:800; font-size:15px; margin-bottom:4px;"><span class="icon-inline"><span class="ui-icon" data-ico="globe"></span><span>London Session</span></span></div>
+              <div class="subtitle" style="margin-bottom:6px;">🕒 ~01:00 PM – 09:00 PM PKT</div>
+              <div class="subtitle">⚡ Liquidity sweeps &amp; trend open • 💶 EUR/USD • 🥇 XAU/USD</div>
+            </div>
+            <div class="stat-card">
+              <div style="font-weight:800; font-size:15px; margin-bottom:4px;"><span class="icon-inline"><span class="ui-icon" data-ico="globe"></span><span>New York Session</span></span></div>
+              <div class="subtitle" style="margin-bottom:6px;">🕒 ~06:30 PM – 02:00 AM PKT</div>
+              <div class="subtitle">🚀 High volume expansion &amp; reversals • 📊 NQ • 🥇 XAU/USD</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DAILY JOURNAL -->
+        <section id="view-journal" class="view-section">
+          <h2 style="margin:0 0 6px 0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="book"></span><span>Daily Journal</span></span></h2>
+          <div class="subtitle" style="margin-bottom:14px;">Mindset state, session review, mistakes &amp; tomorrow's game plan</div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="journalMoodSelect"><span class="icon-inline"><span class="ui-icon" data-ico="brain"></span><span>Mindset &amp; Discipline State</span></span></label>
+              <select id="journalMoodSelect">
+                <option value="🔥 Locked In &amp; Patient">🔥 Locked In &amp; Patient</option>
+                <option value="😌 Calm &amp; Focused">😌 Calm &amp; Focused</option>
+                <option value="⚡ High Energy">⚡ High Energy</option>
+                <option value="⚠️ Rushed / FOMO">⚠️ Rushed / FOMO</option>
+                <option value="😴 Tired / Low Focus">😴 Tired / Low Focus</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="journalScoreInput"><span class="icon-inline"><span class="ui-icon" data-ico="star"></span><span>Execution Score (1–10)</span></span></label>
+              <input id="journalScoreInput" type="number" min="1" max="10" value="8" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="journalNotesInput"><span class="icon-inline"><span class="ui-icon" data-ico="edit"></span><span>Session Notes &amp; Key Takeaways</span></span></label>
+            <textarea id="journalNotesInput" rows="5" placeholder="Write what went well, any emotional triggers, and key rules for the next session..."></textarea>
+          </div>
+          <button id="saveJournalBtn" type="button" class="primary-btn" style="width:auto;"><span class="icon-inline"><span class="ui-icon" data-ico="save"></span><span>Save Journal Entry</span></span></button>
+          <div id="journalSavedMsg" class="status-msg" style="text-align:left;"></div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section id="view-analytics" class="view-section">
+          <h2 style="margin:0 0 6px 0; font-size:21px;"><span class="icon-inline"><span class="ui-icon" data-ico="chart"></span><span>Reports &amp; Analytics</span></span></h2>
+          <div class="subtitle" style="margin-bottom:14px;">Breakdown by pair, direction &amp; setup model</div>
+          <div id="analyticsBreakdown"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ADD TRADE MODAL -->
+  <div id="tradeModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="top-row" style="margin-bottom:12px;">
+        <h3 style="margin:0; font-size:18px;"><span class="icon-inline"><span class="ui-icon" data-ico="plus"></span><span>Log New Trade</span></span></h3>
+        <button id="closeTradeModalBtn" type="button" class="icon-btn" style="padding:5px 9px;">✕</button>
+      </div>
+      <form id="tradeForm">
+        <div class="form-grid-3">
+          <div class="field">
+            <label for="tradeDate"><span class="icon-inline"><span class="ui-icon" data-ico="calendar"></span><span>Date</span></span></label>
+            <input id="tradeDate" type="date" required />
+          </div>
+          <div class="field">
+            <label for="tradePair"><span class="icon-inline"><span class="ui-icon" data-ico="dollar"></span><span>Pair / Asset</span></span></label>
+            <input id="tradePair" type="text" placeholder="XAU/USD" value="XAU/USD" required />
+          </div>
+          <div class="field">
+            <label for="tradeSession"><span class="icon-inline"><span class="ui-icon" data-ico="globe"></span><span>Session</span></span></label>
+            <select id="tradeSession">
+              <option value="London">🇬🇧 London</option>
+              <option value="New York" selected>🇺🇸 New York</option>
+              <option value="Asian">🌏 Asian</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-3">
+          <div class="field">
+            <label for="tradeSide"><span class="icon-inline"><span class="ui-icon" data-ico="target"></span><span>Direction</span></span></label>
+            <select id="tradeSide">
+              <option value="Long">🟢 Long</option>
+              <option value="Short">🔴 Short</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="tradePnl"><span class="icon-inline"><span class="ui-icon" data-ico="dollar"></span><span>P&amp;L ($)</span></span></label>
+            <input id="tradePnl" type="number" step="0.01" placeholder="320" required />
+          </div>
+          <div class="field">
+            <label for="tradeR"><span class="icon-inline"><span class="ui-icon" data-ico="ruler"></span><span>R-Multiple</span></span></label>
+            <input id="tradeR" type="number" step="0.1" placeholder="3.0" value="3.0" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="tradeSetup"><span class="icon-inline"><span class="ui-icon" data-ico="target"></span><span>Setup / Notes</span></span></label>
+          <input id="tradeSetup" type="text" placeholder="Liquidity Sweep &amp; Shift" value="Liquidity Sweep &amp; Shift" />
+        </div>
+        <button type="submit" class="primary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="save"></span><span>Save Trade</span></span></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPABASE SQL SETUP MODAL -->
+  <div id="sqlModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="top-row" style="margin-bottom:10px;">
+        <h3 style="margin:0; font-size:17px;"><span class="icon-inline"><span class="ui-icon" data-ico="database"></span><span>Supabase SQL Table Setup</span></span></h3>
+        <button id="closeSqlModalBtn" type="button" class="icon-btn" style="padding:5px 9px;">✕</button>
+      </div>
+      <div class="subtitle" style="margin-bottom:10px;">
+        📋 Run this SQL in your Supabase SQL Editor when connecting cloud tables:
+      </div>
+      <pre class="sql-box">create table if not exists public.trades (
+  id bigint primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  trade_date date not null,
+  pair text not null,
+  session_name text default 'New York',
+  side text not null,
+  pnl numeric not null default 0,
+  r_multiple numeric default 0,
+  setup text,
+  created_at timestamptz default now()
+);
+
+alter table public.trades enable row level security;
+
+create policy "Users can view own trades"
+  on public.trades for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own trades"
+  on public.trades for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own trades"
+  on public.trades for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own trades"
+  on public.trades for delete
+  using (auth.uid() = user_id);</pre>
+      <button id="copySqlBtn" type="button" class="primary-btn"><span class="icon-inline"><span class="ui-icon" data-ico="copy"></span><span>Copy SQL Script</span></span></button>
+      <div id="sqlCopyMsg" class="status-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://zalkgwdkqxipmfgdskzt.supabase.co";
+    const SUPABASE_ANON_KEY = "Sb_publishable_NeRsEYEtTS4X-bcJ2dnKMw_4aJumJGt";
+
+    let supabaseClient = null;
+    if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        document.getElementById("cloudStatusText").textContent = "☁️ Supabase Client Connected";
+      } catch (e) {
+        console.warn("Supabase init:", e);
+      }
+    } else if (SUPABASE_ANON_KEY) {
+      document.getElementById("cloudStatusText").textContent = "🔑 Publishable Key Added • Add Project URL";
+    }
+
+    const SAMPLE_TRADES = [
+      { id: 1, date: "2026-11-16", pair: "XAU/USD", session: "London", side: "Long", pnl: 420, r: 3.2, setup: "Liquidity Sweep & Shift" },
+      { id: 2, date: "2026-11-17", pair: "NQ", session: "New York", side: "Short", pnl: -150, r: -1.0, setup: "Range Rejection" },
+      { id: 3, date: "2026-11-18", pair: "EUR/USD", session: "London", side: "Long", pnl: 360, r: 3.0, setup: "Trend Pullback & Trail" },
+      { id: 4, date: "2026-11-19", pair: "BTC/USDT", session: "New York", side: "Long", pnl: 290, r: 2.4, setup: "Breakout Retest" },
+      { id: 5, date: "2026-11-20", pair: "XAU/USD", session: "New York", side: "Short", pnl: 480, r: 3.6, setup: "Liquidity Sweep & Shift" }
+    ];
+
+    const DEFAULT_PLAYBOOK = [
+      {
+        id: "pb-1",
+        title: "🔥 Liquidity Sweep & Shift",
+        desc: "🎯 Session high/low sweep + strong displacement + 1:3+ R:R target",
+        rules: ["✅ Session liquidity swept", "✅ Market structure shift confirmed", "✅ Risk <= 1% per trade"]
+      },
+      {
+        id: "pb-2",
+        title: "💎 Trend Pullback & Trail",
+        desc: "📈 Clean impulse + pullback into key zone + trailing stop to lock gains",
+        rules: ["✅ Clear directional trend", "✅ Clean pullback without chasing", "✅ Trail stop after +1.5R"]
+      },
+      {
+        id: "pb-3",
+        title: "🛡️ Zero-FOMO Discipline",
+        desc: "🚫 Strict patience — wait for A+ confirmation and avoid revenge entries",
+        rules: ["✅ No impulsive candle chasing", "✅ Max 2–3 quality trades/day", "✅ Log trade immediately after close"]
+      }
+    ];
+
+    let authMode = "signin";
+    let baseEquity = Number(localStorage.getItem("ez_base_equity_v4") || 10000);
+    let userProfile = JSON.parse(localStorage.getItem("ez_user_v4") || '{"name":"Trader","email":"trader@edgezella.io"}');
+    let trades = JSON.parse(localStorage.getItem("ez_trades_v4") || "null");
+    if (!Array.isArray(trades)) {
+      trades = [...SAMPLE_TRADES];
+      localStorage.setItem("ez_trades_v4", JSON.stringify(trades));
+    }
+
+    let playbookSetups = JSON.parse(localStorage.getItem("ez_playbook_v4") || "null");
+    if (!Array.isArray(playbookSetups)) {
+      playbookSetups = [...DEFAULT_PLAYBOOK];
+      localStorage.setItem("ez_playbook_v4", JSON.stringify(playbookSetups));
+    }
+
+    let currentCalDate = new Date(2026, 10, 1);
+
+    const authWrap = document.getElementById("authWrap");
+    const appShell = document.getElementById("appShell");
+    const tabSignIn = document.getElementById("tabSignIn");
+    const tabCreateAccount = document.getElementById("tabCreateAccount");
+    const nameField = document.getElementById("nameField");
+    const nameInput = document.getElementById("nameInput");
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const submitAuthBtn = document.getElementById("submitAuthBtn");
+    const authForm = document.getElementById("authForm");
+    const demoBtn = document.getElementById("demoBtn");
+    const statusMsg = document.getElementById("statusMsg");
+    const sidebar = document.getElementById("sidebarMenu");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const tradeModal = document.getElementById("tradeModal");
+    const sqlModal = document.getElementById("sqlModal");
+
+    function setStatus(msg, color) {
+      statusMsg.textContent = msg;
+      statusMsg.style.color = color || "var(--muted)";
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      if (mode === "signup") {
+        tabCreateAccount.classList.add("active");
+        tabSignIn.classList.remove("active");
+        nameField.style.display = "block";
+        submitAuthBtn.innerHTML = '<span class="icon-inline"><span class="ui-icon" data-ico="rocket"></span><span>Create Account</span></span>';
+        hydrateIcons();
+        setStatus("Naya account banane ke liye naam, email aur password likhein.", "var(--muted)");
+      } else {
+        tabSignIn.classList.add("active");
+        tabCreateAccount.classList.remove("active");
+        nameField.style.display = "none";
+        submitAuthBtn.innerHTML = '<span class="icon-inline"><span class="ui-icon" data-ico="lock"></span><span>Sign In to Journal</span></span>';
+        hydrateIcons();
+        setStatus("", "var(--muted)");
+      }
+    }
+
+
+    const SVG_ICONS = {
+      sun: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>',
+      moon: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/></svg>',
+      lock: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      rocket: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>',
+      user: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+      mail: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+      key: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
+      zap: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+      plus: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+      palette: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
+      dashboard: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+      calendar: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+      list: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+      target: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+      radar: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/><circle cx="12" cy="12" r="1"/></svg>',
+      book: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>',
+      chart: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>',
+      save: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>',
+      download: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></svg>',
+      refresh: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>',
+      cloud: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>',
+      database: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>',
+      logout: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>',
+      wallet: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>',
+      dollar: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+      scale: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>',
+      ruler: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2"/></svg>',
+      flame: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+      clock: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+      chevLeft: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+      chevRight: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+      globe: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+      brain: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+      star: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      edit: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+      copy: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
+    };
+    function hydrateIcons() {
+      document.querySelectorAll(".ui-icon[data-ico]").forEach((el) => {
+        const key = el.getAttribute("data-ico");
+        if (SVG_ICONS[key]) el.innerHTML = SVG_ICONS[key];
+      });
+    }
+
+    function updateThemeLabels() {
+      const isLight = document.body.classList.contains("light");
+      const ico = isLight ? "moon" : "sun";
+      const txt = isLight ? "Dark" : "Light";
+      const svg = SVG_ICONS[ico] || "";
+      const html = `<span class="icon-inline"><span class="ui-icon" data-ico="${ico}">${svg}</span><span>${txt}</span></span>`;
+      ["authThemeBtn", "topThemeBtn", "sidebarThemeBtn"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+      });
+      hydrateIcons();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+      updateThemeLabels();
+      hydrateIcons();
+    }
+
+    function openDrawer() {
+      sidebar.classList.add("open");
+      drawerBackdrop.classList.add("open");
+    }
+
+    function closeDrawer() {
+      sidebar.classList.remove("open");
+      drawerBackdrop.classList.remove("open");
+    }
+
+    function switchView(viewName) {
+      document.querySelectorAll(".view-section").forEach((sec) => sec.classList.remove("active"));
+      document.querySelectorAll(".nav-item[data-view]").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-view") === viewName);
+      });
+      const target = document.getElementById("view-" + viewName);
+      if (target) target.classList.add("active");
+      closeDrawer();
+      renderAll();
+    }
+
+    function formatMoney(val) {
+      const num = Number(val) || 0;
+      const sign = num > 0 ? "+" : num < 0 ? "-" : "";
+      return `${sign}$${Math.abs(num).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function formatEquity(val) {
+      const num = Number(val) || 0;
+      return `🏦 $${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function renderStats() {
+      const netPnl = trades.reduce((acc, t) => acc + (Number(t.pnl) || 0), 0);
+      const grossProfit = trades.filter((t) => Number(t.pnl) > 0).reduce((a, b) => a + Number(b.pnl), 0);
+      const grossLoss = Math.abs(trades.filter((t) => Number(t.pnl) < 0).reduce((a, b) => a + Number(b.pnl), 0));
+      const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : grossProfit > 0 ? "∞" : "0.00";
+
+      const wins = trades.filter((t) => Number(t.pnl) > 0).length;
+      const winRate = trades.length ? ((wins / trades.length) * 100).toFixed(1) : "0.0";
+
+      const avgRNum = trades.length
+        ? trades.reduce((acc, t) => acc + (Number(t.r) || 0), 0) / trades.length
+        : 0;
+      const avgRStr = `${avgRNum >= 0 ? "+" : ""}${avgRNum.toFixed(2)}R`;
+
+      const currentEquity = baseEquity + netPnl;
+      const retPct = baseEquity > 0 ? ((netPnl / baseEquity) * 100).toFixed(2) : "0.00";
+
+      let streak = 0;
+      for (let i = 0; i < trades.length; i++) {
+        if (Number(trades[i].pnl) > 0) streak++;
+        else break;
+      }
+
+      const pnlEl = document.getElementById("statNetPnl");
+      pnlEl.textContent = (netPnl >= 0 ? "📈 " : "📉 ") + formatMoney(netPnl);
+      pnlEl.className = "stat-val " + (netPnl >= 0 ? "pos" : "neg");
+
+      document.getElementById("statWinRate").textContent = `🎯 ${winRate}%`;
+      document.getElementById("statProfitFactor").textContent = `⚖️ ${profitFactor}`;
+      document.getElementById("statAvgR").textContent = `📐 ${avgRStr}`;
+      document.getElementById("statStreak").textContent = `🔥 ${streak} ${streak === 1 ? "Day" : "Days"}`;
+      document.getElementById("statEquity").textContent = formatEquity(currentEquity);
+      document.getElementById("dashTradeCountBadge").textContent = `📈 ${trades.length} ${trades.length === 1 ? "Trade" : "Trades"}`;
+
+      const retBadge = document.getElementById("equityReturnBadge");
+      retBadge.textContent = `📊 ${Number(retPct) >= 0 ? "+" : ""}${retPct}% return`;
+      retBadge.className = "subtitle " + (Number(retPct) >= 0 ? "pos" : "neg");
+    }
+
+    function renderEquityChart() {
+      const poly = document.getElementById("equityPolyline");
+      const ordered = [...trades].reverse();
+      let running = baseEquity;
+      const points = [running];
+      ordered.forEach((t) => {
+        running += Number(t.pnl) || 0;
+        points.push(running);
+      });
+
+      if (points.length === 1) {
+        poly.setAttribute("points", "20,75 580,75");
+        return;
+      }
+
+      const minVal = Math.min(...points);
+      const maxVal = Math.max(...points);
+      const span = maxVal - minVal || 1;
+      const coords = points.map((val, idx) => {
+        const x = 20 + (idx / (points.length - 1)) * 560;
+        const y = 125 - ((val - minVal) / span) * 100;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+
+      poly.setAttribute("points", coords.join(" "));
+      poly.setAttribute("stroke", points[points.length - 1] >= baseEquity ? "#22c55e" : "#ef4444");
+    }
+
+    function renderWeeklyStrip() {
+      const strip = document.getElementById("weeklyStrip");
+      const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const emojis = ["🌤️", "⚡", "📈", "🎯", "🔥", "🌴", "🧘"];
+
+      strip.innerHTML = days
+        .map((d, idx) => {
+          const dayTrades = trades.filter((_, i) => i % 7 === idx);
+          const sum = dayTrades.reduce((a, b) => a + (Number(b.pnl) || 0), 0);
+          const cls = sum > 0 ? "pos" : sum < 0 ? "neg" : "";
+          return `
+            <div class="stat-card" style="padding:10px; text-align:center; cursor:pointer;" onclick="openTradeModal()">
+              <div style="font-size:12px; font-weight:700;">${emojis[idx]} ${d}</div>
+              <div class="${cls}" style="font-weight:800; font-size:13px; margin-top:4px;">${formatMoney(sum)}</div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function getFilteredTrades() {
+      const q = (document.getElementById("searchPairInput")?.value || "").trim().toUpperCase();
+      const sideFilter = document.getElementById("filterSideSelect")?.value || "ALL";
+      const outFilter = document.getElementById("filterOutcomeSelect")?.value || "ALL";
+
+      return trades.filter((t) => {
+        if (q && !(t.pair || "").toUpperCase().includes(q) && !(t.setup || "").toUpperCase().includes(q)) return false;
+        if (sideFilter !== "ALL" && t.side !== sideFilter) return false;
+        if (outFilter === "WIN" && !(Number(t.pnl) > 0)) return false;
+        if (outFilter === "LOSS" && !(Number(t.pnl) < 0)) return false;
+        return true;
+      });
+    }
+
+    function renderTradesLists() {
+      const recentContainer = document.getElementById("recentTradesContainer");
+      const fullContainer = document.getElementById("fullTradesList");
+
+      if (!trades.length) {
+        const emptyHtml = '<div class="trade-row"><span>📭 Abhi koi trade log nahi hui. ➕ Add Trade par tap karein!</span></div>';
+        recentContainer.innerHTML = emptyHtml;
+        fullContainer.innerHTML = emptyHtml;
+        return;
+      }
+
+      const makeRow = (t, showDelete) => {
+        const isWin = Number(t.pnl) >= 0;
+        const dirEmoji = t.side === "Short" ? "🔴 Short" : "🟢 Long";
+        const pnlColor = isWin ? "pos" : "neg";
+        const rText = t.r !== undefined && t.r !== "" ? ` • 📐 ${Number(t.r) >= 0 ? "+" : ""}${t.r}R` : "";
+        const sessText = t.session ? ` • 🌍 ${t.session}` : "";
+        return `
+          <div class="trade-row">
+            <div>
+              <div style="font-weight:800; font-size:15px;">💹 ${t.pair} <span style="font-size:12px; font-weight:600; color:var(--muted);">• ${dirEmoji}${sessText}</span></div>
+              <div class="subtitle">📅 ${t.date} • 🎯 ${t.setup || "Standard Setup"}${rText}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <strong class="${pnlColor}" style="font-size:15px;">${formatMoney(t.pnl)}</strong>
+              ${showDelete ? `<button type="button" class="secondary-btn" onclick="deleteTrade(${t.id})">🗑️ Delete</button>` : ""}
+            </div>
+          </div>
+        `;
+      };
+
+      recentContainer.innerHTML = trades.slice(0, 4).map((t) => makeRow(t, false)).join("");
+
+      const filtered = getFilteredTrades();
+      fullContainer.innerHTML = filtered.length
+        ? filtered.map((t) => makeRow(t, true)).join("")
+        : '<div class="trade-row"><span>🔎 No matching trades found for your current filter.</span></div>';
+    }
+
+    function deleteTrade(id) {
+      trades = trades.filter((t) => t.id !== id);
+      localStorage.setItem("ez_trades_v4", JSON.stringify(trades));
+      renderAll();
+    }
+
+    function renderCalendar() {
+      const year = currentCalDate.getFullYear();
+      const month = currentCalDate.getMonth();
+      const monthName = currentCalDate.toLocaleString("en-US", { month: "long", year: "numeric" });
+      document.getElementById("calMonthLabel").textContent = `📅 ${monthName}`;
+
+      const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const dows = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+      let html = dows.map((d) => `<div class="cal-dow">${d}</div>`).join("");
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        html += `<div class="cal-day empty"></div>`;
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const mm = String(month + 1).padStart(2, "0");
+        const dd = String(day).padStart(2, "0");
+        const dateStr = `${year}-${mm}-${dd}`;
+        const daySum = trades
+          .filter((t) => t.date === dateStr)
+          .reduce((acc, t) => acc + (Number(t.pnl) || 0), 0);
+
+        let cls = "cal-day";
+        let emoji = "✨";
+        if (daySum > 0) {
+          cls += " win";
+          emoji = "🟢";
+        } else if (daySum < 0) {
+          cls += " loss";
+          emoji = "🔴";
+        }
+
+        html += `
+          <div class="${cls}" onclick="quickAddForDate('${dateStr}')">
+            <div style="display:flex; justify-content:space-between; font-weight:700;">
+              <span>${day}</span>
+              <span>${emoji}</span>
+            </div>
+            <div class="${daySum > 0 ? "pos" : daySum < 0 ? "neg" : "subtitle"}" style="font-weight:800; font-size:11px;">
+              ${daySum !== 0 ? formatMoney(daySum) : "—"}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("calendarGrid").innerHTML = html;
+    }
+
+    function quickAddForDate(dateStr) {
+      document.getElementById("tradeDate").value = dateStr;
+      openTradeModal();
+    }
+
+    function renderPlaybook() {
+      const grid = document.getElementById("playbookGrid");
+      grid.innerHTML = playbookSetups
+        .map(
+          (pb) => `
+          <div class="stat-card">
+            <div style="font-weight:800; font-size:15px; margin-bottom:5px;">${pb.title}</div>
+            <div class="subtitle" style="margin-bottom:8px;">${pb.desc}</div>
+            ${(pb.rules || [])
+              .map(
+                (r) => `<label class="checklist-item"><input type="checkbox" /> <span>${r}</span></label>`
+              )
+              .join("")}
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function renderAnalytics() {
+      const container = document.getElementById("analyticsBreakdown");
+      const map = {};
+      trades.forEach((t) => {
+        const key = t.pair || "ASSET";
+        if (!map[key]) map[key] = { count: 0, wins: 0, pnl: 0 };
+        map[key].count++;
+        if (Number(t.pnl) > 0) map[key].wins++;
+        map[key].pnl += Number(t.pnl) || 0;
+      });
+
+      const entries = Object.entries(map);
+      if (!entries.length) {
+        container.innerHTML = '<div class="stat-card">📭 No analytics data yet.</div>';
+        return;
+      }
+
+      container.innerHTML = entries
+        .map(([pair, info]) => {
+          const wr = info.count ? ((info.wins / info.count) * 100).toFixed(0) : 0;
+          return `
+            <div class="trade-row">
+              <div>
+                <strong>💹 ${pair}</strong>
+                <div class="subtitle">📊 ${info.count} ${info.count === 1 ? "trade" : "trades"} • 🎯 ${wr}% win rate</div>
+              </div>
+              <strong class="${info.pnl >= 0 ? "pos" : "neg"}">${formatMoney(info.pnl)}</strong>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function renderAll() {
+      document.getElementById("headerUserSubtitle").textContent = `👤 ${userProfile.name} • ${userProfile.email}`;
+      document.getElementById("sidebarAccountName").textContent = `👤 ${userProfile.name.toUpperCase()}`;
+      document.getElementById("sidebarAccountEmail").textContent = `📧 ${userProfile.email}`;
+      renderStats();
+      renderEquityChart();
+      renderWeeklyStrip();
+      renderTradesLists();
+      renderCalendar();
+      renderPlaybook();
+      renderAnalytics();
+      hydrateIcons();
+    }
+
+    function enterApp(name, email) {
+      userProfile = { name: name || "Trader", email: email || "trader@edgezella.io" };
+      localStorage.setItem("ez_user_v4", JSON.stringify(userProfile));
+      authWrap.style.display = "none";
+      appShell.style.display = "block";
+      renderAll();
+    }
+
+    function openTradeModal() {
+      if (!document.getElementById("tradeDate").value) {
+        document.getElementById("tradeDate").value = "2026-11-21";
+      }
+      tradeModal.classList.add("open");
+    }
+
+    function closeTradeModal() {
+      tradeModal.classList.remove("open");
+    }
+
+    function bindTap(el, handler) {
+      if (!el) return;
+      let lastTouch = 0;
+      el.addEventListener("touchend", (e) => {
+        lastTouch = Date.now();
+        e.preventDefault();
+        handler(e);
+      }, { passive: false });
+      el.addEventListener("click", (e) => {
+        if (Date.now() - lastTouch < 450) return;
+        handler(e);
+      });
+    }
+
+    bindTap(tabSignIn, () => setAuthMode("signin"));
+    bindTap(tabCreateAccount, () => setAuthMode("signup"));
+    bindTap(document.getElementById("authThemeBtn"), toggleTheme);
+    document.getElementById("topThemeBtn").addEventListener("click", toggleTheme);
+    document.getElementById("sidebarThemeBtn").addEventListener("click", toggleTheme);
+
+    bindTap(demoBtn, () => {
+      setStatus("Instant Demo Account launch ho raha hai...", "#5eead4");
+      enterApp("Demo Trader", "demo@edgezella.io");
+    });
+
+    bindTap(submitAuthBtn, () => {
+      if (typeof authForm.requestSubmit === "function") {
+        authForm.requestSubmit();
+      } else {
+        authForm.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+      }
+    });
+
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = (emailInput.value || "").trim();
+      const password = passwordInput.value || "";
+      const traderName = ((nameInput && nameInput.value) || email.split("@")[0] || "Trader").trim();
+
+      if (!email || password.length < 6) {
+        setStatus("Email sahi likhein aur password kam az kam 6 characters ka rakhein.", "var(--danger)");
+        return;
+      }
+
+      if (supabaseClient) {
+        setStatus(authMode === "signup" ? "Account create ho raha hai..." : "Sign in ho raha hai...", "#5eead4");
+        try {
+          if (authMode === "signup") {
+            const { data, error } = await supabaseClient.auth.signUp({
+              email,
+              password,
+              options: { data: { full_name: traderName } }
+            });
+            if (error) {
+              setStatus("Supabase error: " + error.message, "var(--danger)");
+              return;
+            }
+            if (!data.session) {
+              setStatus("Account ban gaya! Email inbox/spam check karke confirm karein ya phir Sign In / Demo use karein.", "#5eead4");
+              return;
+            }
+          } else {
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+              setStatus("Supabase error: " + error.message, "var(--danger)");
+              return;
+            }
+          }
+        } catch (err) {
+          setStatus("Connection issue: " + (err && err.message ? err.message : "Supabase network error"), "var(--danger)");
+          return;
+        }
+      }
+
+      enterApp(traderName, email);
+    });
+
+    document.getElementById("menuToggleBtn").addEventListener("click", openDrawer);
+    document.getElementById("closeDrawerBtn").addEventListener("click", closeDrawer);
+    drawerBackdrop.addEventListener("click", closeDrawer);
+
+    document.querySelectorAll(".nav-item[data-view]").forEach((btn) => {
+      btn.addEventListener("click", () => switchView(btn.getAttribute("data-view")));
+    });
+
+    document.getElementById("quickAddBtn").addEventListener("click", openTradeModal);
+    document.getElementById("sidebarAddTradeBtn").addEventListener("click", () => {
+      closeDrawer();
+      openTradeModal();
+    });
+    document.getElementById("closeTradeModalBtn").addEventListener("click", closeTradeModal);
+
+    document.getElementById("editBaseEquityBtn").addEventListener("click", () => {
+      const next = prompt("🏦 Enter Base Account Equity ($):", String(baseEquity));
+      if (next !== null && !isNaN(Number(next)) && Number(next) > 0) {
+        baseEquity = Number(next);
+        localStorage.setItem("ez_base_equity_v4", String(baseEquity));
+        renderAll();
+      }
+    });
+
+    document.getElementById("tradeForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const date = document.getElementById("tradeDate").value || "2026-11-21";
+      const pair = (document.getElementById("tradePair").value || "XAU/USD").trim().toUpperCase();
+      const session = document.getElementById("tradeSession").value || "New York";
+      const side = document.getElementById("tradeSide").value;
+      const pnl = Number(document.getElementById("tradePnl").value) || 0;
+      const r = Number(document.getElementById("tradeR").value) || 0;
+      const setup = (document.getElementById("tradeSetup").value || "Setup").trim();
+
+      trades.unshift({ id: Date.now(), date, pair, session, side, pnl, r, setup });
+      localStorage.setItem("ez_trades_v4", JSON.stringify(trades));
+      document.getElementById("tradePnl").value = "";
+      closeTradeModal();
+      renderAll();
+    });
+
+    document.getElementById("searchPairInput").addEventListener("input", renderTradesLists);
+    document.getElementById("filterSideSelect").addEventListener("change", renderTradesLists);
+    document.getElementById("filterOutcomeSelect").addEventListener("change", renderTradesLists);
+
+    document.getElementById("addPlaybookBtn").addEventListener("click", () => {
+      const title = prompt("🎯 Setup Name (e.g. 🔥 NY Opening Drive):");
+      if (!title || !title.trim()) return;
+      const desc = prompt("📝 Short Description:") || "⚡ High-probability edge setup";
+      playbookSetups.push({
+        id: "pb-" + Date.now(),
+        title: title.trim(),
+        desc: desc.trim(),
+        rules: ["✅ Key level / liquidity respected", "✅ Risk & stop-loss defined"]
+      });
+      localStorage.setItem("ez_playbook_v4", JSON.stringify(playbookSetups));
+      renderPlaybook();
+    });
+
+    document.getElementById("prevMonthBtn").addEventListener("click", () => {
+      currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+      renderCalendar();
+    });
+
+    document.getElementById("nextMonthBtn").addEventListener("click", () => {
+      currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+      renderCalendar();
+    });
+
+    const savedJournal = JSON.parse(localStorage.getItem("ez_journal_v4") || '{"mood":"🔥 Locked In & Patient","score":8,"notes":""}');
+    document.getElementById("journalMoodSelect").value = savedJournal.mood || "🔥 Locked In & Patient";
+    document.getElementById("journalScoreInput").value = savedJournal.score || 8;
+    document.getElementById("journalNotesInput").value = savedJournal.notes || "";
+
+    document.getElementById("saveJournalBtn").addEventListener("click", () => {
+      const payload = {
+        mood: document.getElementById("journalMoodSelect").value,
+        score: Number(document.getElementById("journalScoreInput").value) || 8,
+        notes: document.getElementById("journalNotesInput").value
+      };
+      localStorage.setItem("ez_journal_v4", JSON.stringify(payload));
+      const msg = document.getElementById("journalSavedMsg");
+      msg.textContent = "✅ Daily journal entry save ho gaya!";
+      msg.style.color = "var(--success)";
+    });
+
+    document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(trades, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "edgezella-trades.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("exportCsvBtn").addEventListener("click", () => {
+      const header = "Date,Pair,Session,Side,PnL,R_Multiple,Setup
+";
+      const rows = trades.map((t) => `${t.date},"${t.pair}","${t.session || ""}",${t.side},${t.pnl},${t.r || 0},"${(t.setup || "").replace(/"/g, '""')}"`).join("
+");
+      const blob = new Blob([header + rows], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "edgezella-trades.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("resetSampleBtn").addEventListener("click", () => {
+      trades = [...SAMPLE_TRADES];
+      localStorage.setItem("ez_trades_v4", JSON.stringify(trades));
+      closeDrawer();
+      renderAll();
+    });
+
+    document.getElementById("openSqlModalBtn").addEventListener("click", () => {
+      closeDrawer();
+      sqlModal.classList.add("open");
+    });
+
+    document.getElementById("closeSqlModalBtn").addEventListener("click", () => {
+      sqlModal.classList.remove("open");
+    });
+
+    document.getElementById("copySqlBtn").addEventListener("click", async () => {
+      const sqlText = document.querySelector(".sql-box").textContent;
+      try {
+        await navigator.clipboard.writeText(sqlText);
+        document.getElementById("sqlCopyMsg").textContent = "✅ SQL copied to clipboard!";
+      } catch (e) {
+        document.getElementById("sqlCopyMsg").textContent = "📋 Select & copy the SQL above.";
+      }
+    });
+
+    document.getElementById("signOutBtn").addEventListener("click", () => {
+      closeDrawer();
+      appShell.style.display = "none";
+      authWrap.style.display = "flex";
+      setStatus("👋 Signed out.", "var(--muted)");
+    });
+
+    window.addEventListener("DOMContentLoaded", () => { updateThemeLabels(); hydrateIcons(); });
+    updateThemeLabels();
+    hydrateIcons();
+  </script>
+</body>
+</html>
